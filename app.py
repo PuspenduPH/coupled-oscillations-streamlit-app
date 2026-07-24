@@ -1390,8 +1390,10 @@ def main() -> None:
     for tab, system in zip(tabs, ("double", "triple", "spring")):
         with tab:
             render_system(system, params_by_system[system])
+
     st.markdown(
-        "<div class='footer'><span>Built with Streamlit · Matplotlib · SciPy</span><span>Local-first physics studio · outputs saved to <span class='mono'>outputs/</span></span></div>",
+        "<div class='footer'><span>Built with Streamlit · Matplotlib · SciPy</span><span>Source Code available at: "
+        "<a href='https://github.com/PuspenduPH/coupled-oscillations-streamlit-app' target='_blank'>https://github.com/PuspenduPH/coupled-oscillations-streamlit-app</a></span></div>",
         unsafe_allow_html=True,
     )
 
