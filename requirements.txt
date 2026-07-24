@@ -1,0 +1,7 @@
+streamlit
+pandas
+matplotlib
+numpy
+scipy
+pillow
+# MP4 export uses the system-level ffmpeg executable when available.
