@@ -561,7 +561,7 @@ def common_controls() -> dict[str, Any]:
                 "Simulation time",
                 min_value=5.0,
                 max_value=90.0,
-                step=2.0,
+                step=1.0,
                 key="common_time",
                 help="Total simulated time in seconds.",
             )
@@ -1010,20 +1010,10 @@ def create_animation(
 def default_filename(system: str, params: dict[str, Any]) -> str:
     """Mirror each module's established CLI naming convention."""
     if system == "double":
-        return (
-            f"time_series_m1_{params['m1']}_m2_{params['m2']}_k_{params['k']}_L_{params['L']}_"
-            f"theta1_{params['theta_1_init']}_theta2_{params['theta_2_init']}"
-        )
+        return "double_pendulum"
     if system == "triple":
-        return (
-            f"triple_pendulum_m1_{params['m1']}_m2_{params['m2']}_m3_{params['m3']}_"
-            f"k1_{params['k1']}_k2_{params['k2']}_L_{params['L']}_"
-            f"theta1_{params['theta_1_init']}_theta2_{params['theta_2_init']}_theta3_{params['theta_3_init']}"
-        )
-    return (
-        f"mass_spring_m1={params['m1']}_m2={params['m2']}_k1={params['k1']}_"
-        f"k2={params['k2']}_k3={params['k3']}"
-    )
+        return "triple_pendulum"
+    return "mass_spring"
 
 
 def schematic(system: str) -> None:
@@ -1226,12 +1216,7 @@ def export_panel(system: str, params: dict[str, Any], data: SimulationData) -> N
     enabled = st.checkbox("Save this animation", key=f"export_enable_{system}")
     if not enabled:
         return
-    ffmpeg_available = shutil.which("ffmpeg") is not None
-    formats = ["GIF"] + (["MP4"] if ffmpeg_available else [])
-    if not ffmpeg_available:
-        st.info(
-            "MP4 is unavailable because ffmpeg was not found on PATH. GIF export remains available."
-        )
+    formats = ["GIF", "MP4"]
     fmt_label = st.radio(
         "Format", formats, horizontal=True, key=f"export_format_{system}"
     )
@@ -1248,22 +1233,23 @@ def export_panel(system: str, params: dict[str, Any], data: SimulationData) -> N
         filename = f"{stem}.{fmt}"
         try:
             with st.spinner(f"Rendering {fmt.upper()} export..."):
-                create_animation(
-                    system,
-                    params,
-                    data,
-                    save_anim=True,
-                    save_format=fmt,
-                    filename=filename,
-                )
-            path = SAVE_DIR / filename
-            if not path.exists():
-                raise RuntimeError(
-                    "The animation writer did not create the expected file."
-                )
-            payload = path.read_bytes()
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    tmp_path = Path(tmpdir) / filename
+                    create_animation(
+                        system,
+                        params,
+                        data,
+                        save_anim=True,
+                        save_format=fmt,
+                        filename=str(tmp_path),
+                    )
+                    if not tmp_path.exists():
+                        raise RuntimeError(
+                            "The animation writer did not create the expected file."
+                        )
+                    payload = tmp_path.read_bytes()
             st.session_state[f"download_{system}"] = (filename, payload, fmt)
-            st.success(f"Saved {filename}")
+            st.success(f"Generated {filename} successfully.")
         except Exception as exc:
             st.error(f"Could not save the animation: {exc}")
     download = st.session_state.get(f"download_{system}")
