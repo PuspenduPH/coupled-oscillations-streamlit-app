@@ -7,6 +7,11 @@ A sleek, interactive physics simulation environment built with Python and Stream
 ![SciPy](https://img.shields.io/badge/SciPy-8CAAE6?style=for-the-badge&logo=scipy&logoColor=white)
 ![Matplotlib](https://img.shields.io/badge/Matplotlib-11557c?style=for-the-badge&logo=python&logoColor=white)
 
+
+
+> 🌐 **Live Demo:** Explore the web app in your browser at [coupled-oscillations-streamlit-app](https://coupled-oscillations-app-app-7wpyffmaklhjjozxnkjszf.streamlit.app/)
+
+
 ## ✨ Features
 
 - **Three Physical Systems:**
